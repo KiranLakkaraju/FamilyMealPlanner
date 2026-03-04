@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "family-meal-planner"
+version = "0.1.0"
+description = "A family meal planner with inventory management"
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pytest-cov>=4.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--tb=short"
+
+[tool.coverage.run]
+source = ["meal_planner"]
+omit = ["meal_planner/__init__.py"]
+
+[tool.coverage.report]
+show_missing = true
