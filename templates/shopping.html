@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Shopping List - Family Meal Planner{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Shopping List</h1>
+    {% if items %}
+    <a href="{{ url_for('clear_purchased') }}" class="btn btn-secondary" onclick="return confirm('Remove all purchased items?')">Clear Purchased</a>
+    {% endif %}
+</div>
+
+<div class="form-card">
+    <h2>Add Item</h2>
+    <form method="post" action="{{ url_for('add_shopping_item') }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="name">Item *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number" id="quantity" name="quantity" step="any" min="0" value="1">
+            </div>
+            <div class="form-group">
+                <label for="unit">Unit</label>
+                <input type="text" id="unit" name="unit" placeholder="e.g., lbs, cups">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Add to List</button>
+    </form>
+</div>
+
+{% if items %}
+<div class="shopping-list">
+    {% for item in items %}
+    <div class="shopping-item {% if item.purchased %}purchased{% endif %}">
+        <a href="{{ url_for('toggle_shopping_item', item_id=item.id) }}" class="checkbox">
+            {% if item.purchased %}&#9745;{% else %}&#9744;{% endif %}
+        </a>
+        <span class="item-name">{{ item.quantity }} {{ item.unit }} {{ item.name }}</span>
+        <a href="{{ url_for('delete_shopping_item', item_id=item.id) }}" class="delete-btn">&times;</a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p>Shopping list is empty. Add items manually or generate from your meal plan.</p>
+</div>
+{% endif %}
+{% endblock %}

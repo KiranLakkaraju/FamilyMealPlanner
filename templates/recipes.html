@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Recipes - Family Meal Planner{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Recipes</h1>
+    <a href="{{ url_for('new_recipe') }}" class="btn btn-primary">+ New Recipe</a>
+</div>
+
+{% if recipes %}
+<div class="card-grid">
+    {% for recipe in recipes %}
+    <div class="card">
+        <div class="card-body">
+            <h3><a href="{{ url_for('view_recipe', recipe_id=recipe.id) }}">{{ recipe.name }}</a></h3>
+            <p class="text-muted">{{ recipe.description[:100] }}{% if recipe.description|length > 100 %}...{% endif %}</p>
+            <div class="recipe-meta">
+                <span>Servings: {{ recipe.servings }}</span>
+                {% if recipe.prep_time %}<span>Prep: {{ recipe.prep_time }}min</span>{% endif %}
+                {% if recipe.cook_time %}<span>Cook: {{ recipe.cook_time }}min</span>{% endif %}
+            </div>
+        </div>
+        <div class="card-actions">
+            <a href="{{ url_for('edit_recipe', recipe_id=recipe.id) }}" class="btn btn-sm btn-secondary">Edit</a>
+            <a href="{{ url_for('delete_recipe', recipe_id=recipe.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this recipe?')">Delete</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <p>No recipes yet. <a href="{{ url_for('new_recipe') }}">Create your first recipe!</a></p>
+</div>
+{% endif %}
+{% endblock %}

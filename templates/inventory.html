@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Inventory - Family Meal Planner{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Pantry Inventory</h1>
+</div>
+
+<div class="form-card">
+    <h2>Add Item</h2>
+    <form method="post" action="{{ url_for('add_inventory_item') }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="name">Item Name *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity</label>
+                <input type="number" id="quantity" name="quantity" step="any" min="0" value="0">
+            </div>
+            <div class="form-group">
+                <label for="unit">Unit</label>
+                <input type="text" id="unit" name="unit" placeholder="e.g., lbs, cups, oz">
+            </div>
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" name="category">
+                    <option value="produce">Produce</option>
+                    <option value="dairy">Dairy</option>
+                    <option value="meat">Meat & Seafood</option>
+                    <option value="grains">Grains & Bread</option>
+                    <option value="canned">Canned Goods</option>
+                    <option value="frozen">Frozen</option>
+                    <option value="spices">Spices & Seasonings</option>
+                    <option value="condiments">Condiments & Sauces</option>
+                    <option value="beverages">Beverages</option>
+                    <option value="other" selected>Other</option>
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Add to Inventory</button>
+    </form>
+</div>
+
+{% if items %}
+{% set categories = items|groupby('category') %}
+{% for category, cat_items in categories %}
+<div class="inventory-category">
+    <h2>{{ category|capitalize }}</h2>
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cat_items %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.unit }}</td>
+                <td>
+                    <form method="post" action="{{ url_for('edit_inventory_item', item_id=item.id) }}" class="inline-form">
+                        <input type="hidden" name="name" value="{{ item.name }}">
+                        <input type="number" name="quantity" value="{{ item.quantity }}" step="any" min="0" class="input-sm">
+                        <input type="hidden" name="unit" value="{{ item.unit }}">
+                        <input type="hidden" name="category" value="{{ item.category }}">
+                        <button type="submit" class="btn btn-sm btn-secondary">Update</button>
+                    </form>
+                    <a href="{{ url_for('delete_inventory_item', item_id=item.id) }}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endfor %}
+{% else %}
+<div class="empty-state">
+    <p>Your pantry is empty. Add items to track what you have on hand.</p>
+</div>
+{% endif %}
+{% endblock %}

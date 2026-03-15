@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Meal Plan - Family Meal Planner{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Weekly Meal Plan</h1>
+    <div class="week-nav">
+        <a href="?week={{ week_offset - 1 }}" class="btn btn-sm">&larr; Previous</a>
+        <span class="week-label">{{ week_label }}</span>
+        <a href="?week={{ week_offset + 1 }}" class="btn btn-sm">Next &rarr;</a>
+        {% if week_offset != 0 %}
+        <a href="?week=0" class="btn btn-sm btn-secondary">Today</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="meal-plan-grid">
+    {% for day in days %}
+    <div class="day-card {% if day.is_today %}today{% endif %}">
+        <div class="day-header">{{ day.label }}{% if day.is_today %} <span class="badge">Today</span>{% endif %}</div>
+
+        {% for meal_type in ['breakfast', 'lunch', 'dinner', 'snack'] %}
+        <div class="meal-slot">
+            <div class="meal-type">{{ meal_type|capitalize }}</div>
+            {% for meal in plan[day.date][meal_type] %}
+            <div class="meal-item">
+                <a href="{{ url_for('view_recipe', recipe_id=meal.recipe_id) }}">{{ meal.recipe_name }}</a>
+                <a href="{{ url_for('delete_meal', meal_id=meal.id) }}" class="delete-btn" title="Remove">&times;</a>
+            </div>
+            {% endfor %}
+            {% if recipes %}
+            <form method="post" action="{{ url_for('add_meal') }}" class="add-meal-form">
+                <input type="hidden" name="date" value="{{ day.date }}">
+                <input type="hidden" name="meal_type" value="{{ meal_type }}">
+                <input type="hidden" name="week" value="{{ week_offset }}">
+                <select name="recipe_id" required>
+                    <option value="">+ Add</option>
+                    {% for r in recipes %}
+                    <option value="{{ r.id }}">{{ r.name }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-sm btn-primary">Add</button>
+            </form>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endfor %}
+</div>
+
+{% if not recipes %}
+<div class="empty-state">
+    <p>No recipes yet! <a href="{{ url_for('new_recipe') }}">Create your first recipe</a> to start planning meals.</p>
+</div>
+{% endif %}
+
+<div class="actions-bar">
+    <form method="post" action="{{ url_for('generate_shopping') }}">
+        <input type="hidden" name="week" value="{{ week_offset }}">
+        <button type="submit" class="btn btn-primary">Generate Shopping List from This Week</button>
+    </form>
+</div>
+{% endblock %}
